@@ -1,0 +1,15 @@
+flask
+flask-sqlalchemy
+flask-cors
+flask-migrate
+psycopg2-binary
+yfinance
+requests
+beautifulsoup4
+python-dotenv
+sqlalchemy
+werkzeug
+# defeatbeta-api # Uncomment if available, or we will mock/wrapper it
+# databento # For premium data
+polygon-api-client
+openai

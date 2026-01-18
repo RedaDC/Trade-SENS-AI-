@@ -1,7 +1,8 @@
-"use client";
-import React, { useEffect, useRef, memo } from 'react';
+// ... (imports)
+import React, { useEffect, useRef } from 'react';
 
-export const ChartComponent = memo(function ChartComponent({
+export const ChartComponent = React.memo(function ChartComponent({
+    // ... (rest of component)
     symbol = "EURUSD",
     theme = "dark",
     autosize = true,

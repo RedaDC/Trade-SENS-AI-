@@ -1,6 +1,6 @@
 import requests
-from backend.models import NewsEvent
-from backend.extensions import db
+from models import NewsEvent
+from extensions import db
 from datetime import datetime
 
 class NewsService:

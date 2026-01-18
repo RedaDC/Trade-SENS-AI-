@@ -1,6 +1,5 @@
 "use client";
 import React from 'react';
-import clsx from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
 interface AnalysisData {
@@ -39,57 +38,79 @@ export function FinanceAICard({ data, symbol }: FinanceAICardProps) {
     const isBuy = rec === "BUY";
     const isSell = rec === "SELL";
 
-    // Dynamic Colors based on Signal
-    const borderColor = isBuy ? "border-green-500/50" : isSell ? "border-red-500/50" : "border-slate-500/50";
-    const bgColor = isBuy ? "bg-green-500/10" : isSell ? "bg-red-500/10" : "bg-slate-500/10";
-    const textColor = isBuy ? "text-green-400" : isSell ? "text-red-400" : "text-slate-400";
-    const badgeColor = isBuy ? "bg-green-500 text-white" : isSell ? "bg-red-500 text-white" : "bg-slate-600 text-slate-200";
+    // Dynamic Styles based on Signal
+    const borderColor = isBuy ? "border-emerald-500/40" : isSell ? "border-rose-500/40" : "border-slate-500/40";
+    const shadowColor = isBuy ? "shadow-emerald-500/10" : isSell ? "shadow-rose-500/10" : "shadow-slate-500/10";
+    const textColor = isBuy ? "text-emerald-400" : isSell ? "text-rose-400" : "text-slate-400";
+    const gradient = isBuy
+        ? "from-emerald-500/20 to-emerald-900/10"
+        : isSell
+            ? "from-rose-500/20 to-rose-900/10"
+            : "from-slate-700/20 to-slate-900/10";
 
     return (
-        <div className={twMerge("w-full max-w-sm rounded-xl border backdrop-blur-md overflow-hidden transition-all duration-300 hover:shadow-lg", "bg-slate-900/80", borderColor)}>
-
-            {/* Header: Signal & Confidence */}
-            <div className={twMerge("p-4 flex justify-between items-center border-b border-white/5", bgColor)}>
-                <div>
-                    <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider">AI Analysis • {symbol}</h4>
-                    <div className={twMerge("text-2xl font-black mt-1", textColor)}>{rec}</div>
-                </div>
-                <div className="flex flex-col items-end gap-1">
-                    <span className="text-xs text-slate-400">Confidence</span>
-                    <div className="flex items-center gap-2">
-                        <span className="font-bold text-white">{decision.confidence}%</span>
-                        {/* Circular Progress or Bar */}
-                        <div className="w-12 h-2 bg-slate-700 rounded-full overflow-hidden">
-                            <div className={twMerge("h-full rounded-full", isBuy ? "bg-green-500" : isSell ? "bg-red-500" : "bg-slate-500")} style={{ width: `${decision.confidence}%` }}></div>
+        <div className={twMerge(
+            "w-full max-w-sm rounded-2xl border backdrop-blur-xl overflow-hidden transition-all duration-500 hover:scale-[1.02]",
+            "bg-slate-950/40 shadow-2xl ring-1 ring-white/10",
+            borderColor,
+            shadowColor
+        )}>
+            {/* Header section with Signal and Confidence */}
+            <div className={twMerge("p-6 bg-gradient-to-br border-b border-white/5", gradient)}>
+                <div className="flex justify-between items-start">
+                    <div className="flex items-center gap-4">
+                        <div className={twMerge(
+                            "w-12 h-12 rounded-xl flex items-center justify-center shadow-lg ring-1 ring-white/10 transition-transform duration-700 hover:rotate-6",
+                            isBuy ? "bg-emerald-500/30" : isSell ? "bg-rose-500/30" : "bg-slate-500/30"
+                        )}>
+                            <span className="text-2xl">{isBuy ? "▲" : isSell ? "▼" : "◆"}</span>
+                        </div>
+                        <div>
+                            <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-0.5">Live Intelligence • {symbol}</p>
+                            <h2 className={twMerge("text-3xl font-black tracking-tighter", textColor)}>{rec}</h2>
+                        </div>
+                    </div>
+                    <div className="text-right">
+                        <div className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Scale</div>
+                        <div className="flex items-center gap-2">
+                            <div className="w-20 h-2 bg-slate-900/80 rounded-full border border-white/5 overflow-hidden">
+                                <div
+                                    className={twMerge("h-full transition-all duration-1000", isBuy ? "bg-emerald-500" : isSell ? "bg-rose-500" : "bg-slate-500")}
+                                    style={{ width: `${decision.confidence}%` }}
+                                ></div>
+                            </div>
+                            <span className="font-mono text-sm font-bold text-white leading-none">{decision.confidence}%</span>
                         </div>
                     </div>
                 </div>
             </div>
 
-            {/* Content Body */}
-            <div className="p-4 space-y-4">
-
-                {/* Reasoning */}
-                <div className="text-sm text-slate-300 italic leading-relaxed border-l-2 border-slate-600 pl-3">
-                    "{decision.reasoning}"
+            {/* Analysis Content */}
+            <div className="p-6 space-y-6">
+                <div className="relative">
+                    <div className="absolute -left-3 top-0 bottom-0 w-0.5 bg-blue-500/50 rounded-full"></div>
+                    <p className="text-sm text-slate-300 leading-relaxed font-medium italic">
+                        "{decision.reasoning}"
+                    </p>
                 </div>
 
-                {/* Technical Grid */}
-                <div className="grid grid-cols-2 gap-2 text-xs">
-                    <StatBox label="Trend" value={market_structure.trend} />
-                    <StatBox label="RSI (14)" value={technical.rsi.value.toString()} sub={technical.rsi.signal} />
-                    <StatBox label="Support" value={market_structure.support_level.toFixed(2)} />
-                    <StatBox label="Resistance" value={market_structure.resistance_level.toFixed(2)} />
+                <div className="grid grid-cols-2 gap-3">
+                    <InsightBox label="Trend" value={market_structure.trend} icon="🧭" />
+                    <InsightBox label="RSI" value={technical.rsi.value.toFixed(1)} sub={technical.rsi.signal} icon="📈" />
+                    <InsightBox label="Support" value={market_structure.support_level.toFixed(2)} icon="🛡️" />
+                    <InsightBox label="Resist." value={market_structure.resistance_level.toFixed(2)} icon="🏹" />
                 </div>
 
-                {/* Risk Management Section (Only if actionable) */}
                 {rec !== "WAIT" && (
-                    <div className="bg-slate-800/50 rounded-lg p-3 space-y-2 border border-slate-700/50">
-                        <div className="text-xs font-bold text-slate-400 uppercase mb-1">Risk Management</div>
-                        <div className="grid grid-cols-3 gap-2 text-center">
-                            <RiskBox label="Entry" value={risk_management.entry_zone.split("-")[0].trim()} color="text-yellow-400" />
-                            <RiskBox label="Stop Loss" value={risk_management.stop_loss?.toString() || "-"} color="text-red-400" />
-                            <RiskBox label="Target" value={risk_management.take_profit?.toString() || "-"} color="text-green-400" />
+                    <div className="mt-4 p-4 rounded-xl bg-slate-900/60 border border-white/5 space-y-3">
+                        <div className="flex items-center gap-2 text-[10px] font-black text-slate-500 uppercase tracking-widest">
+                            <span className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-pulse"></span>
+                            Risk Matrix Execution
+                        </div>
+                        <div className="grid grid-cols-3 gap-4">
+                            <ExecutionDetail label="Entry" value={risk_management.entry_zone.split("-")[0].trim()} color="text-sky-400" />
+                            <ExecutionDetail label="Stop" value={risk_management.stop_loss?.toString() || "-"} color="text-rose-400" />
+                            <ExecutionDetail label="Target" value={risk_management.take_profit?.toString() || "-"} color="text-emerald-400" />
                         </div>
                     </div>
                 )}
@@ -98,21 +119,21 @@ export function FinanceAICard({ data, symbol }: FinanceAICardProps) {
     );
 }
 
-function StatBox({ label, value, sub }: { label: string, value: string, sub?: string }) {
+function InsightBox({ label, value, sub, icon }: { label: string, value: string, sub?: string, icon: string }) {
     return (
-        <div className="bg-slate-800/50 rounded p-2 flex flex-col items-center justify-center border border-slate-700/30">
-            <span className="text-slate-500 mb-1">{label}</span>
-            <span className="font-mono font-bold text-slate-200">{value}</span>
-            {sub && <span className="text-[10px] text-slate-400">{sub}</span>}
+        <div className="bg-white/5 hover:bg-white/10 transition-colors rounded-xl p-3 border border-white/5 flex flex-col items-center text-center">
+            <span className="text-xs mb-1 opacity-50">{icon} {label}</span>
+            <span className="text-sm font-bold text-slate-100 truncate w-full">{value}</span>
+            {sub && <span className="text-[10px] text-blue-400 font-bold uppercase mt-1">{sub}</span>}
         </div>
-    )
+    );
 }
 
-function RiskBox({ label, value, color }: { label: string, value: string, color: string }) {
+function ExecutionDetail({ label, value, color }: { label: string, value: string, color: string }) {
     return (
-        <div className="flex flex-col">
-            <span className="text-[10px] text-slate-500">{label}</span>
-            <span className={clsx("font-mono font-bold text-sm", color)}>{value}</span>
+        <div className="flex flex-col gap-0.5">
+            <span className="text-[9px] font-bold text-slate-500 uppercase tracking-tighter">{label}</span>
+            <span className={twMerge("text-sm font-mono font-bold tracking-tight", color)}>{value}</span>
         </div>
-    )
+    );
 }

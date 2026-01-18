@@ -1,8 +1,8 @@
 from flask import Flask
 from flask_cors import CORS
-from .config.config import DevelopmentConfig
-from .extensions import db
-from .models import *
+from config.config import DevelopmentConfig
+from extensions import db
+from models import *
 
 def create_app(config_class=DevelopmentConfig):
     app = Flask(__name__)
@@ -13,16 +13,16 @@ def create_app(config_class=DevelopmentConfig):
     CORS(app)
     
     # Register Blueprints
-    from .routes.auth_routes import auth_bp
-    from .routes.challenge_routes import challenge_bp
-    from .routes.trade_routes import trade_bp
-    from .routes.market_routes import market_bp
-    from .routes.news_routes import news_bp
-    from .routes.leaderboard_routes import leaderboard_bp
-    from .routes.admin_routes import admin_bp
-    from .routes.analysis_routes import market_bp_analysis
-    from .routes.ai_analysis_routes import ai_analysis_bp
-    from .routes.ai_routes import ai_bp
+    from routes.auth_routes import auth_bp
+    from routes.challenge_routes import challenge_bp
+    from routes.trade_routes import trade_bp
+    from routes.market_routes import market_bp
+    from routes.news_routes import news_bp
+    from routes.leaderboard_routes import leaderboard_bp
+    from routes.admin_routes import admin_bp
+    from routes.analysis_routes import market_bp_analysis
+    from routes.ai_analysis_routes import ai_analysis_bp
+    from routes.ai_routes import ai_bp
     
     app.register_blueprint(auth_bp, url_prefix='/api/v1/<tenant>/auth')
     app.register_blueprint(challenge_bp, url_prefix='/api/v1/<tenant>/challenges')

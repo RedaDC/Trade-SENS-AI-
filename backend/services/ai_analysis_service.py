@@ -120,21 +120,30 @@ class AIAnalysisService:
         }
 
     def _get_simulated_analysis(self, symbol, timeframe, price, news_analysis, technical):
-        """Original Demo Logic"""
+        """
+        Smart Demo Logic: Generates coherent, correlated data.
+        Unlike the random version, this ensures indicators match the trend.
+        """
         
-        # Step 2: Market Structure & Trend
-        market_structure = self._analyze_market_structure(symbol, price)
+        # 1. Determine Major Trend (Randomly, but then enforces consistency)
+        trend_direction = random.choices(["Bullish", "Bearish", "Range"], weights=[40, 40, 20])[0]
         
-        # Step 4: Sentiment Check
-        sentiment = self._analyze_sentiment(symbol)
+        # 2. Generate Correlated Technicals based on Trend
+        technical = self._generate_coherent_technicals(trend_direction, price)
         
-        # Step 5: Trade Scenario Evaluation
-        scenarios = self._evaluate_scenarios(symbol, price, technical, sentiment)
+        # 3. Generate Correlated Market Structure
+        market_structure = self._generate_coherent_structure(trend_direction, price)
         
-        # Step 6: Final Decision
-        decision = self._make_decision(scenarios, technical, market_structure)
+        # 4. Generate Correlated Sentiment
+        sentiment = self._generate_coherent_sentiment(trend_direction)
         
-        # Step 7: Risk Management
+        # 5. Generate Correlated Scenarios
+        scenarios = self._evaluate_coherent_scenarios(trend_direction, price)
+        
+        # 6. Make Decision (Obvious based on the trend)
+        decision = self._make_coherent_decision(trend_direction, scenarios)
+        
+        # 7. Risk Management
         risk_management = self._calculate_risk_management(decision, price)
         
         return {
@@ -142,9 +151,9 @@ class AIAnalysisService:
             "timeframe": timeframe,
             "current_price": price,
             "timestamp": datetime.now().isoformat(),
-            "mode": "DEMO",
+            "mode": "Simulated Professional (Demo)",
             "analysis": {
-                "news_macro": news_analysis,
+                "news_macro": self._generate_coherent_news(trend_direction, symbol),
                 "market_structure": market_structure,
                 "technical": technical,
                 "sentiment": sentiment,
@@ -154,7 +163,140 @@ class AIAnalysisService:
             }
         }
     
-    # --- Helper Data Generators (Used for inputs in Real Mode, logic in Demo) ---
+    # --- Coherent Generators ---
+
+    def _generate_coherent_technicals(self, trend, price):
+        """Generate indicators that actually match the price action"""
+        if trend == "Bullish":
+            rsi = random.randint(55, 75)
+            rsi_signal = "Bullish Momentum" if rsi < 70 else "Overbought"
+            macd_val = round(random.uniform(0.1, 0.5), 3)
+            macd_sig = "Bullish"
+            ema_align = "Bullish" # 20 > 50 > 200
+            ema_20 = price * 0.995
+            ema_50 = price * 0.985
+            ema_200 = price * 0.95
+        elif trend == "Bearish":
+            rsi = random.randint(25, 45)
+            rsi_signal = "Bearish Momentum" if rsi > 30 else "Oversold"
+            macd_val = round(random.uniform(-0.5, -0.1), 3)
+            macd_sig = "Bearish"
+            ema_align = "Bearish" # 20 < 50 < 200
+            ema_20 = price * 1.005
+            ema_50 = price * 1.015
+            ema_200 = price * 1.05
+        else: # Range
+            rsi = random.randint(45, 55)
+            rsi_signal = "Neutral"
+            macd_val = round(random.uniform(-0.05, 0.05), 3)
+            macd_sig = "Neutral"
+            ema_align = "Mixed"
+            ema_20 = price * 1.001
+            ema_50 = price * 0.999
+            ema_200 = price * 1.01
+            
+        return {
+            "rsi": {"value": rsi, "signal": rsi_signal, "period": 14},
+            "macd": {"value": macd_val, "signal": macd_sig, "histogram": "Positive" if macd_val > 0 else "Negative"},
+            "ema": {"ema_20": round(ema_20, 2), "ema_50": round(ema_50, 2), "ema_200": round(ema_200, 2), "alignment": ema_align},
+            "volume": {"trend": "Increasing" if trend != "Range" else "Stable"}
+        }
+
+    def _generate_coherent_structure(self, trend, price):
+        if trend == "Bullish":
+            support = round(price * 0.98, 2)
+            resistance = round(price * 1.05, 2) # Far away
+            trend_str = "Strong Uptrend"
+        elif trend == "Bearish":
+            support = round(price * 0.95, 2) # Far away
+            resistance = round(price * 1.02, 2)
+            trend_str = "Strong Downtrend"
+        else:
+            support = round(price * 0.99, 2)
+            resistance = round(price * 1.01, 2)
+            trend_str = "Consolidation"
+            
+        return {
+            "trend": trend_str,
+            "trend_strength": "High" if trend != "Range" else "Low",
+            "support_level": support,
+            "resistance_level": resistance
+        }
+
+    def _generate_coherent_sentiment(self, trend):
+        if trend == "Bullish":
+            score = random.randint(60, 85)
+            label = "Greed"
+            env = "Risk-On"
+        elif trend == "Bearish":
+            score = random.randint(15, 40)
+            label = "Fear"
+            env = "Risk-Off"
+        else:
+            score = random.randint(45, 55)
+            label = "Neutral"
+            env = "Mixed"
+            
+        return {
+            "environment": env,
+            "fear_greed_index": score,
+            "sentiment_label": label,
+            "positioning": f"Biased {trend}"
+        }
+
+    def _generate_coherent_news(self, trend, symbol):
+        impact = trend if trend != "Range" else "Neutral"
+        headlines = {
+            "Bullish": ["Strong Earnings Beat Expectations", "Analyst Upgrades to Outperform", "Positive Macro Data Release"],
+            "Bearish": ["Inflation Concerns Rise", "Missed Earnings & Weak Guidance", "Regulatory Headwinds Intensify"],
+            "Neutral": ["Market Awaits Fed Decision", "Consolidation Continues on Low Vol", "Mixed Economic Data"]
+        }
+        return {
+            "impact": impact,
+            "key_events": random.sample(headlines.get(trend, headlines["Neutral"]), 2),
+            "description": f"News flow is supporting a {trend.lower()} outlook.",
+            "overreaction_risk": "Medium"
+        }
+
+    def _evaluate_coherent_scenarios(self, trend, price):
+        if trend == "Bullish":
+            return {
+                "bullish": {"probability": 75, "case": f"Breakout above {round(price*1.005, 2)} confirms continuation.", "target": round(price*1.04, 2)},
+                "bearish": {"probability": 15, "case": f"Unexpected drop below {round(price*0.99, 2)} invalidates.", "target": round(price*0.97, 2)},
+                "wait": {"probability": 10, "case": "Consolidation at highs.", "reason": "Overbought temporarily."}
+            }
+        elif trend == "Bearish":
+            return {
+                "bullish": {"probability": 15, "case": f"Reversal above {round(price*1.02, 2)}.", "target": round(price*1.05, 2)},
+                "bearish": {"probability": 75, "case": f"breakdown below {round(price*0.995, 2)} targets lows.", "target": round(price*0.95, 2)},
+                "wait": {"probability": 10, "case": "Oversold bounce likely.", "reason": "Taking profits."}
+            }
+        else: # Range
+            return {
+                "bullish": {"probability": 30, "case": f"Break resistance at {round(price*1.01, 2)}.", "target": round(price*1.03, 2)},
+                "bearish": {"probability": 30, "case": f"Break support at {round(price*0.99, 2)}.", "target": round(price*0.97, 2)},
+                "wait": {"probability": 40, "case": "Chop city.", "reason": "No clear direction."}
+            }
+
+    def _make_coherent_decision(self, trend, scenarios):
+        if trend == "Bullish":
+            return {
+                "recommendation": "BUY",
+                "confidence": scenarios["bullish"]["probability"],
+                "reasoning": "Strong bullish structure with confirmed EMA alignment and positive momentum."
+            }
+        elif trend == "Bearish":
+            return {
+                "recommendation": "SELL",
+                "confidence": scenarios["bearish"]["probability"],
+                "reasoning": "Bearish market structure, negative MACD, and price rejected at EMA resistance."
+            }
+        else:
+            return {
+                "recommendation": "WAIT",
+                "confidence": scenarios["wait"]["probability"],
+                "reasoning": "Market is consolidating. Wait for a breakout of key levels before entering."
+            }
     
     def _get_simulated_price(self, symbol: str) -> float:
         """Generate realistic simulated price"""
@@ -170,129 +312,50 @@ class AIAnalysisService:
         return round(base + variation, 2)
     
     def _analyze_news(self, symbol: str) -> Dict[str, Any]:
-        """Analyze news and macro events"""
-        news_impacts = ["Bullish", "Bearish", "Neutral"]
-        impact = random.choice(news_impacts)
-        events = {
-            "EURUSD": ["ECB Rate Decision", "US CPI Data", "EUR GDP Report"],
-            "GBPUSD": ["BoE Meeting", "UK Employment Data", "Brexit Updates"],
-            "TSLA": ["Earnings Report", "Production Numbers", "EV Market News"],
-            "GOLD": ["Fed Policy Shift", "Geopolitical Tension", "Inflation Hedge Demand"],
-        }
-        if symbol.endswith('.MA'):
-            events[symbol] = ["Morocco GDP", "Bank Al-Maghrib Decision", "CSE Index Update"]
-        relevant_events = events.get(symbol, ["Market Update", "Economic Data"])
-        
-        return {
-            "impact": impact,
-            "key_events": random.sample(relevant_events, min(2, len(relevant_events))),
-            "description": f"Recent {impact.lower()} news flow detected",
-            "overreaction_risk": random.choice(["Low", "Medium", "High"])
-        }
+        """Placeholder for Real Mode pre-analysis"""
+        return {}
     
     def _analyze_technical_indicators(self, symbol: str, price: float) -> Dict[str, Any]:
-        """Analyze technical indicators"""
-        rsi = random.randint(30, 70)
-        rsi_signal = "Oversold" if rsi < 35 else "Overbought" if rsi > 65 else "Neutral"
-        macd_value = round(random.uniform(-0.5, 0.5), 3)
-        macd_signal = "Bullish" if macd_value > 0 else "Bearish"
-        
-        ema_20 = round(price * random.uniform(0.99, 1.01), 2)
-        ema_50 = round(price * random.uniform(0.98, 1.02), 2)
-        ema_200 = round(price * random.uniform(0.95, 1.05), 2)
-        ema_alignment = "Bullish" if ema_20 > ema_50 > ema_200 else "Bearish" if ema_20 < ema_50 < ema_200 else "Mixed"
-        
-        return {
-            "rsi": {"value": rsi, "signal": rsi_signal, "period": 14},
-            "macd": {"value": macd_value, "signal": macd_signal, "histogram": "Positive" if macd_value > 0 else "Negative"},
-            "ema": {"ema_20": ema_20, "ema_50": ema_50, "ema_200": ema_200, "alignment": ema_alignment},
-            "volume": {"trend": random.choice(["Increasing", "Decreasing", "Stable"])}
-        }
-
-    # --- Demo Logic Helpers ---
-
+        """Placeholder for Real Mode pre-analysis"""
+        return {}
+    
     def _analyze_market_structure(self, symbol: str, price: float) -> Dict[str, Any]:
-        """Analyze market structure and trend"""
-        trends = ["Bullish", "Bearish", "Range-bound"]
-        trend = random.choice(trends)
-        support = round(price * 0.98, 2)
-        resistance = round(price * 1.02, 2)
-        return {
-            "trend": trend,
-            "trend_strength": random.choice(["Strong", "Moderate", "Weak"]),
-            "support_level": support,
-            "resistance_level": resistance,
-            "key_levels": [{"type": "Support", "price": support, "strength": "Strong"}, {"type": "Resistance", "price": resistance, "strength": "Moderate"}],
-            "liquidity_zones": f"Major liquidity around {support} and {resistance}"
-        }
+        """Placeholder for Real Mode pre-analysis"""
+        return {}
     
     def _analyze_sentiment(self, symbol: str) -> Dict[str, Any]:
-        """Analyze market sentiment"""
-        fear_greed = random.randint(20, 80)
-        sentiment_label = "Fear" if fear_greed < 40 else "Greed" if fear_greed > 60 else "Neutral"
-        return {
-            "environment": random.choice(["Risk-On", "Risk-Off", "Mixed"]),
-            "fear_greed_index": fear_greed,
-            "sentiment_label": sentiment_label,
-            "positioning": random.choice(["Crowded Long", "Crowded Short", "Balanced"])
-        }
-    
+        """Placeholder for Real Mode pre-analysis"""
+        return {}
+        
     def _evaluate_scenarios(self, symbol: str, price: float, technical: Dict, sentiment: Dict) -> Dict[str, Any]:
-        """Evaluate bullish, bearish, and no-trade scenarios"""
-        bullish_factors = 0
-        bearish_factors = 0
+        """Placeholder for Real Mode pre-analysis"""
+        return {}
         
-        if technical['rsi']['signal'] == "Oversold": bullish_factors += 1
-        elif technical['rsi']['signal'] == "Overbought": bearish_factors += 1
-        if technical['macd']['signal'] == "Bullish": bullish_factors += 1
-        elif technical['macd']['signal'] == "Bearish": bearish_factors += 1
-        if technical['ema']['alignment'] == "Bullish": bullish_factors += 1
-        elif technical['ema']['alignment'] == "Bearish": bearish_factors += 1
-        
-        total = bullish_factors + bearish_factors
-        if total == 0:
-            bull = 33; bear = 33; wait = 34
-        else:
-            bull = int((bullish_factors/total)*60)+20
-            bear = int((bearish_factors/total)*60)+20
-            wait = 100 - bull - bear
-            
-        return {
-            "bullish": {"probability": bull, "case": f"Price breaks above {round(price * 1.01, 2)}", "target": round(price * 1.03, 2)},
-            "bearish": {"probability": bear, "case": f"Price breaks below {round(price * 0.99, 2)}", "target": round(price * 0.97, 2)},
-            "wait": {"probability": wait, "case": "Conflicting signals", "reason": "Wait for confirmation"}
-        }
-    
     def _make_decision(self, scenarios: Dict, technical: Dict, market_structure: Dict) -> Dict[str, Any]:
-        """Make final trading decision"""
-        probs = {"BUY": scenarios['bullish']['probability'], "SELL": scenarios['bearish']['probability'], "WAIT": scenarios['wait']['probability']}
-        rec = max(probs, key=probs.get)
+        """Placeholder for Real Mode pre-analysis"""
+        return {}
         
-        reasoning = ""
-        if rec == "BUY":
-            reasoning = f"{market_structure['trend']} trend with {technical['ema']['alignment']} EMA alignment."
-        elif rec == "SELL":
-            reasoning = f"{market_structure['trend']} trend with {technical['macd']['signal']} MACD signal."
-        else:
-            reasoning = "Mixed signals across multiple timeframes."
-            
-        return {"recommendation": rec, "confidence": probs[rec], "reasoning": reasoning}
-    
     def _calculate_risk_management(self, decision: Dict, price: float) -> Dict[str, Any]:
         """Calculate risk management parameters"""
         rec = decision['recommendation']
         if rec == "BUY":
+            entry = price
+            sl = round(price * 0.99, 2) # Tight SL
+            tp = round(price * 1.03, 2) # 1:3 RR roughly
             return {
-                "entry_zone": f"{round(price * 0.998, 2)} - {round(price * 1.002, 2)}",
-                "stop_loss": round(price * 0.98, 2),
-                "take_profit": round(price * 1.04, 2),
-                "risk_reward_ratio": 2.0, "position_size": "1-2%", "risk_level": "Medium"
+                "entry_zone": f"{round(entry*0.999, 2)} - {round(entry*1.001, 2)}",
+                "stop_loss": sl,
+                "take_profit": tp,
+                "risk_reward_ratio": 3.0, "position_size": "2%", "risk_level": "Medium"
             }
         elif rec == "SELL":
+            entry = price
+            sl = round(price * 1.01, 2)
+            tp = round(price * 0.97, 2)
             return {
-                "entry_zone": f"{round(price * 0.998, 2)} - {round(price * 1.002, 2)}",
-                "stop_loss": round(price * 1.02, 2),
-                "take_profit": round(price * 0.96, 2),
-                "risk_reward_ratio": 2.0, "position_size": "1-2%", "risk_level": "Medium"
+                "entry_zone": f"{round(entry*0.999, 2)} - {round(entry*1.001, 2)}",
+                "stop_loss": sl,
+                "take_profit": tp,
+                "risk_reward_ratio": 3.0, "position_size": "2%", "risk_level": "Medium"
             }
         return {"entry_zone": "N/A", "stop_loss": None, "take_profit": None, "risk_reward_ratio": None, "position_size": "0%", "risk_level": "N/A"}

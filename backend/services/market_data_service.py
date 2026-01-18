@@ -82,18 +82,39 @@ class PolygonProvider(IMarketDataProvider):
 
     def _format_symbol(self, symbol):
         # Helper to format for Polygon
-        if symbol == 'EURUSD': return 'C:EURUSD'
-        if symbol == 'GBPUSD': return 'C:GBPUSD'
-        if symbol == 'USDJPY': return 'C:USDJPY'
-        if symbol == 'BTCUSD': return 'X:BTCUSD'
-        return symbol
+        s = symbol.upper()
+        if s == 'EURUSD': return 'C:EURUSD'
+        if s == 'GBPUSD': return 'C:GBPUSD'
+        if s == 'USDJPY': return 'C:USDJPY'
+        if s == 'BTCUSD': return 'X:BTCUSD'
+        if s == 'ETHUSD': return 'X:ETHUSD'
+        if s == 'GOLD': return 'C:XAUUSD'
+        if s == 'SILVER': return 'C:XAGUSD'
+        
+        # If it's a Moroccan stock, Polygon won't have it, so let it fail and fallback
+        return s
 
 class YFinanceProvider(IMarketDataProvider):
     def __init__(self):
         print("Market Data initialized with YFinanceProvider (Free Tier).")
+        self.symbol_map = {
+            'EURUSD': 'EURUSD=X',
+            'GBPUSD': 'GBPUSD=X',
+            'USDJPY': 'USDJPY=X',
+            'BTCUSD': 'BTC-USD',
+            'ETHUSD': 'ETH-USD',
+            'GOLD': 'GC=F',
+            'SILVER': 'SI=F',
+            'TSLA': 'TSLA',
+            'AAPL': 'AAPL'
+        }
+
+    def _map_symbol(self, symbol: str) -> str:
+        return self.symbol_map.get(symbol, symbol)
 
     def get_last_price(self, symbol: str) -> float:
-        ticker = yf.Ticker(symbol)
+        ticker_symbol = self._map_symbol(symbol)
+        ticker = yf.Ticker(ticker_symbol)
         try:
             # history(period='1d') is usually reliable
             hist = ticker.history(period="1d")
@@ -112,7 +133,8 @@ class YFinanceProvider(IMarketDataProvider):
         if timeframe in ['1m', '5m', '15m', '1h', '1d']:
             interval = timeframe
         
-        ticker = yf.Ticker(symbol)
+        ticker_symbol = self._map_symbol(symbol)
+        ticker = yf.Ticker(ticker_symbol)
         try:
             # period depends on limit and timeframe, simplified here
             hist = ticker.history(period="1mo", interval=interval)

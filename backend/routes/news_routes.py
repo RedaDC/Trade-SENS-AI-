@@ -88,7 +88,36 @@ def generate_realistic_news(count=20):
     
     # Sort by timestamp (newest first)
     news_items.sort(key=lambda x: x['timestamp'], reverse=True)
+    
+    # Add frontend compatibility fields
+    for item in news_items:
+        item['title'] = item['headline']
+        item['time'] = item['time_ago']
+        
     return news_items
+
+@news_bp.route('/calendar', methods=['GET'])
+def get_calendar(tenant):
+    """Get economic calendar events"""
+    symbol = request.args.get('symbol', 'EURUSD')
+    
+    # Mock data for economic calendar
+    events = [
+        {"title": "Non-Farm Payrolls", "currency": "USD", "impact": "HIGH", "time": "14:30", "actual": "225K", "forecast": "180K"},
+        {"title": "ECB Interest Rate Decision", "currency": "EUR", "impact": "HIGH", "time": "13:45", "actual": "4.5%", "forecast": "4.5%"},
+        {"title": "CPI m/m", "currency": "USD", "impact": "MEDIUM", "time": "14:30", "actual": "0.3%", "forecast": "0.2%"},
+        {"title": "Retail Sales", "currency": "GBP", "impact": "MEDIUM", "time": "08:00", "actual": "0.1%", "forecast": "0.1%"},
+    ]
+    
+    # Filter/Customise based on symbol if needed
+    if 'USD' in symbol:
+        events = [e for e in events if e['currency'] == 'USD']
+    elif 'EUR' in symbol:
+        events = [e for e in events if e['currency'] == 'EUR']
+    elif 'GBP' in symbol:
+        events = [e for e in events if e['currency'] == 'GBP']
+        
+    return jsonify(events)
 
 @news_bp.route('/', methods=['GET'])
 def get_news(tenant):

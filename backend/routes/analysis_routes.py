@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify
-from backend.services.ai_analyst import AIAnalyst
+from services.ai_analyst import AIAnalyst
 
 market_bp_analysis = Blueprint('market_analysis', __name__)
 

@@ -1,5 +1,5 @@
-from backend.models import UserChallenge, Trade
-from backend.extensions import db
+from models import UserChallenge, Trade
+from extensions import db
 from datetime import datetime
 
 class ChallengeService:

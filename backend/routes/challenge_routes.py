@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
-from backend.services.challenge_service import ChallengeService
-from backend.models import UserChallenge
+from services.challenge_service import ChallengeService
+from models import UserChallenge
 
 challenge_bp = Blueprint('challenge', __name__)
 

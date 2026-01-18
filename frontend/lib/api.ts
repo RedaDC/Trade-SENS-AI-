@@ -32,6 +32,15 @@ export async function fetchNews() {
     }
 }
 
+export async function fetchCalendar(symbol: string) {
+    try {
+        const res = await fetch(`${BASE_URL}/news/calendar?symbol=${symbol}`);
+        return res.json();
+    } catch (e) {
+        return [];
+    }
+}
+
 export async function placeTrade(trade: any) {
     const res = await fetch(`${BASE_URL}/trades/`, {
         method: 'POST',

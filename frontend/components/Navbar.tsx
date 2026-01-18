@@ -3,7 +3,7 @@ import { Button } from './ui/button';
 
 export default function Navbar() {
     return (
-        <nav className="flex items-center justify-between p-6 bg-slate-900 border-b border-slate-800">
+        <nav className="sticky top-0 z-40 flex items-center justify-between p-6 bg-slate-900/80 backdrop-blur-md border-b border-white/5 supports-[backdrop-filter]:bg-slate-900/50">
             <div className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-emerald-400 text-transparent bg-clip-text">
                 TradeSense AI
             </div>

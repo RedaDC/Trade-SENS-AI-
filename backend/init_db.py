@@ -1,6 +1,6 @@
-from backend.app import create_app
-from backend.extensions import db
-from backend.models import Tenant, TenantSettings
+from app import create_app
+from extensions import db
+from models import Tenant, TenantSettings
 
 def init_db():
     app = create_app()
@@ -16,15 +16,27 @@ def init_db():
             settings = TenantSettings(
                 tenant_id=tenant.id,
                 market_data_provider='YFINANCE',
-                price_starter=99.0,
+                data_quality_level='INSTITUTIONAL', 
+                ai_service_level='PREMIUM',
+                price_starter=49.0,
                 price_pro=199.0,
-                price_elite=299.0 
+                price_elite=349.0 
             )
             db.session.add(settings)
             db.session.commit()
             print("Initialized TradeSense tenant.")
         else:
-            print("Tenant already exists.")
+            tenant = Tenant.query.filter_by(subdomain='tradesense').first()
+            if tenant and tenant.settings:
+                tenant.settings.price_starter = 49.0
+                tenant.settings.price_pro = 199.0
+                tenant.settings.price_elite = 349.0
+                tenant.settings.data_quality_level = 'INSTITUTIONAL'
+                tenant.settings.ai_service_level = 'PREMIUM'
+                db.session.commit()
+                print("Updated existing TradeSense tenant prices.")
+            else:
+                print("Tenant exists but settings missing.")
 
 if __name__ == '__main__':
     init_db()

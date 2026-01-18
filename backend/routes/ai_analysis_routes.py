@@ -2,7 +2,7 @@
 AI Analysis Routes - Trading Analysis API
 """
 from flask import Blueprint, jsonify, request
-from backend.services.ai_analysis_service import AIAnalysisService
+from services.ai_analysis_service import AIAnalysisService
 
 ai_analysis_bp = Blueprint('ai_analysis', __name__)
 analysis_service = AIAnalysisService()

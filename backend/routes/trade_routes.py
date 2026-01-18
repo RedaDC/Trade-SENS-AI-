@@ -1,7 +1,7 @@
 from flask import Blueprint, request, jsonify
-from backend.services.challenge_service import ChallengeService
-from backend.models import Trade, UserChallenge
-from backend.extensions import db
+from services.challenge_service import ChallengeService
+from models import Trade, UserChallenge
+from extensions import db
 
 trade_bp = Blueprint('trade', __name__)
 

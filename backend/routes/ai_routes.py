@@ -2,7 +2,7 @@
 AI Chat Routes - Financial Chatbot API
 """
 from flask import Blueprint, jsonify, request
-from backend.services.chat_service import AIChatService
+from services.chat_service import AIChatService
 
 ai_bp = Blueprint('ai', __name__)
 chat_service = AIChatService()

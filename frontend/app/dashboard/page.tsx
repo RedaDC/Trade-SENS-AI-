@@ -6,7 +6,7 @@ import { AIAnalysisPanel } from '@/components/AIAnalysisPanel';
 import { MoroccanStocksList } from '@/components/MoroccanStocksList';
 import { FinanceAIWidget } from '@/components/FinanceAIWidget';
 import { AITradingAnalysis } from '@/components/AITradingAnalysis';
-import { fetchMarketData, fetchNews, placeTrade } from '@/lib/api';
+import { fetchMarketData, fetchNews, fetchCalendar, placeTrade } from '@/lib/api';
 
 export default function Dashboard() {
     type ExecutionEntry = {
@@ -35,8 +35,7 @@ export default function Dashboard() {
                 if (Math.random() > 0.7) {
                     const action = Math.random() > 0.5 ? "BUY" : "SELL";
                     const msg = `AI Placed ${action} order on ${symbol} @ ${price || 'MARKET'}`;
-                    // @ts-ignore
-                    setToasts((prev) => [msg, ...prev].slice(0, 5));
+                    setToasts(prev => [msg, ...prev].slice(0, 5));
 
                     const entry: ExecutionEntry = {
                         time: new Date().toLocaleTimeString(),
@@ -48,7 +47,7 @@ export default function Dashboard() {
                             ? 'AI detected bullish momentum near support; executed BUY.'
                             : 'AI detected bearish momentum near resistance; executed SELL.'
                     };
-                    setExecutions((prev) => [entry, ...prev].slice(0, 20));
+                    setExecutions(prev => [entry, ...prev].slice(0, 20));
                 }
             }, 3000); // Check every 3 seconds
         }
@@ -67,8 +66,7 @@ export default function Dashboard() {
         try {
             await placeTrade(trade);
             const msg = `Manual ${side} order placed on ${symbol} @ ${price}`;
-            // @ts-ignore
-            setToasts((prev) => [msg, ...prev].slice(0, 5));
+            setToasts(prev => [msg, ...prev].slice(0, 5));
 
             const entry: ExecutionEntry = {
                 time: new Date().toLocaleTimeString(),
@@ -78,11 +76,10 @@ export default function Dashboard() {
                 price: price || undefined,
                 explanation: 'User triggered execution from Trading Controls.'
             };
-            setExecutions((prev) => [entry, ...prev].slice(0, 20));
+            setExecutions(prev => [entry, ...prev].slice(0, 20));
         } catch (e) {
             console.error(e);
-            // @ts-ignore
-            setToasts((prev) => ["Failed to place trade", ...prev].slice(0, 5));
+            setToasts(prev => ["Failed to place trade", ...prev].slice(0, 5));
         }
     };
 
@@ -99,51 +96,21 @@ export default function Dashboard() {
     }, [symbol]);
 
     useEffect(() => {
-        // Fetch news relevant to the selected symbol
-        fetchNews().then(data => {
-            // Filter news based on symbol
-            let filtered = data;
-
-            // For Moroccan stocks, show MAD/Morocco related events
-            if (symbol.endsWith('.MA')) {
-                filtered = [
-                    { title: "Morocco GDP Growth Report", currency: "MAD", impact: "HIGH", time: "09:00", actual: "3.2%", forecast: "3.0%" },
-                    { title: "Casablanca Stock Exchange Index", currency: "MAD", impact: "MEDIUM", time: "10:30", actual: "+1.5%", forecast: "+1.2%" },
-                    { title: "Bank Al-Maghrib Interest Rate Decision", currency: "MAD", impact: "HIGH", time: "14:00", actual: "2.5%", forecast: "2.5%" },
-                    { title: "Morocco Inflation Rate y/y", currency: "MAD", impact: "MEDIUM", time: "11:00", actual: "5.1%", forecast: "5.3%" },
-                ];
+        // Fetch economic calendar relevant to the symbol
+        fetchCalendar(symbol).then((data: any[]) => {
+            if (data && data.length > 0) {
+                setNews(data);
+            } else {
+                // If no calendar events, fallback to general news headlines
+                fetchNews().then(newsData => {
+                    setNews((newsData || []).slice(0, 8));
+                });
             }
-            // For Forex pairs, extract currency and show relevant events
-            else if (symbol.includes('USD') || symbol.includes('TSLA') || symbol.includes('AAPL') || symbol === 'GOLD') {
-                filtered = [
-                    { title: "USD Non-Farm Employment Change", currency: "USD", impact: "HIGH", time: "14:30", actual: "195K", forecast: "180K" },
-                    { title: "USD Unemployment Rate", currency: "USD", impact: "HIGH", time: "14:30", actual: "3.6%", forecast: "3.7%" },
-                    { title: "USD Fed Interest Rate Decision", currency: "USD", impact: "HIGH", time: "20:00", actual: "5.5%", forecast: "5.5%" },
-                    { title: "USD Core CPI m/m", currency: "USD", impact: "MEDIUM", time: "14:30", actual: "0.3%", forecast: "0.3%" },
-                ];
-            }
-            else if (symbol.includes('EUR')) {
-                filtered = [
-                    { title: "EUR ECB President Lagarde Speaks", currency: "EUR", impact: "HIGH", time: "15:00", actual: "", forecast: "" },
-                    { title: "EUR GDP q/q", currency: "EUR", impact: "HIGH", time: "11:00", actual: "0.1%", forecast: "0.2%" },
-                    { title: "EUR CPI y/y", currency: "EUR", impact: "MEDIUM", time: "11:00", actual: "2.4%", forecast: "2.5%" },
-                ];
-            }
-            else if (symbol.includes('GBP')) {
-                filtered = [
-                    { title: "GBP GDP m/m", currency: "GBP", impact: "HIGH", time: "08:00", actual: "0.1%", forecast: "0.2%" },
-                    { title: "GBP BoE Interest Rate Decision", currency: "GBP", impact: "HIGH", time: "13:00", actual: "5.25%", forecast: "5.25%" },
-                    { title: "GBP Unemployment Rate", currency: "GBP", impact: "MEDIUM", time: "08:00", actual: "4.2%", forecast: "4.3%" },
-                ];
-            }
-            else if (symbol.includes('JPY')) {
-                filtered = [
-                    { title: "JPY Core CPI y/y", currency: "JPY", impact: "HIGH", time: "00:30", actual: "2.2%", forecast: "2.1%" },
-                    { title: "JPY BoJ Interest Rate Decision", currency: "JPY", impact: "HIGH", time: "04:00", actual: "-0.1%", forecast: "-0.1%" },
-                ];
-            }
-
-            setNews(filtered.slice(0, 8)); // Limit to 8 events
+        }).catch(() => {
+            // Fallback to general news on error
+            fetchNews().then(newsData => {
+                setNews((newsData || []).slice(0, 8));
+            });
         });
     }, [symbol]); // Re-fetch when symbol changes
 

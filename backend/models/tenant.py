@@ -1,4 +1,4 @@
-from backend.extensions import db
+from extensions import db
 from datetime import datetime
 
 class Tenant(db.Model):
@@ -27,6 +27,8 @@ class TenantSettings(db.Model):
     
     # Provider Configs
     market_data_provider = db.Column(db.String(50), default='YFINANCE') # YFINANCE, PREMIUM_US, DEFEATBETA
+    data_quality_level = db.Column(db.String(50), default='DELAYED') # DELAYED, REALTIME, INSTITUTIONAL
+    ai_service_level = db.Column(db.String(50), default='BASIC') # BASIC, ADVANCED, PREMIUM
     news_api_base_url = db.Column(db.String(200))
     news_api_key = db.Column(db.String(200))
     
@@ -35,6 +37,6 @@ class TenantSettings(db.Model):
     paypal_secret = db.Column(db.String(200))
     
     # Pricing
-    price_starter = db.Column(db.Float, default=99.0)
+    price_starter = db.Column(db.Float, default=49.0)
     price_pro = db.Column(db.Float, default=199.0)
-    price_elite = db.Column(db.Float, default=499.0)
+    price_elite = db.Column(db.Float, default=349.0)

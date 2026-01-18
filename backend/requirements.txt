@@ -9,6 +9,7 @@ beautifulsoup4
 python-dotenv
 sqlalchemy
 werkzeug
+gunicorn
 # defeatbeta-api # Uncomment if available, or we will mock/wrapper it
 # databento # For premium data
 polygon-api-client

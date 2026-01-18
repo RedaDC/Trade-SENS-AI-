@@ -100,7 +100,7 @@ export default function LoginPage() {
                 </Button>
 
                 <div className="mt-6 text-center text-sm text-slate-500">
-                    Don't have an account?
+                    Don&apos;t have an account?
                     <a href="/pricing" className="text-blue-400 cursor-pointer hover:underline ml-1">
                         Start a Challenge
                     </a>

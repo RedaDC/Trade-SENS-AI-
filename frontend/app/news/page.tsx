@@ -38,26 +38,26 @@ export default function NewsPage() {
     const categories = ['Markets', 'Forex', 'Stocks', 'Commodities'];
 
     useEffect(() => {
+        const fetchNews = async () => {
+            setLoading(true);
+            let url = '/api/v1/tradesense/news/';
+            const params = new URLSearchParams();
+            if (selectedSource) params.append('source', selectedSource);
+            if (selectedCategory) params.append('category', selectedCategory);
+            if (params.toString()) url += '?' + params.toString();
+
+            try {
+                const res = await fetch(url);
+                const data = await res.json();
+                setNews(data);
+            } catch (e) {
+                console.error(e);
+            }
+            setLoading(false);
+        };
+
         fetchNews();
     }, [selectedSource, selectedCategory]);
-
-    const fetchNews = async () => {
-        setLoading(true);
-        let url = '/api/v1/tradesense/news/';
-        const params = new URLSearchParams();
-        if (selectedSource) params.append('source', selectedSource);
-        if (selectedCategory) params.append('category', selectedCategory);
-        if (params.toString()) url += '?' + params.toString();
-
-        try {
-            const res = await fetch(url);
-            const data = await res.json();
-            setNews(data);
-        } catch (e) {
-            console.error(e);
-        }
-        setLoading(false);
-    };
 
     const filteredNews = news.filter(item =>
         item.headline.toLowerCase().includes(searchQuery.toLowerCase()) ||

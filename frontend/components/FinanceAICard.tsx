@@ -90,7 +90,7 @@ export function FinanceAICard({ data, symbol }: FinanceAICardProps) {
                 <div className="relative">
                     <div className="absolute -left-3 top-0 bottom-0 w-0.5 bg-blue-500/50 rounded-full"></div>
                     <p className="text-sm text-slate-300 leading-relaxed font-medium italic">
-                        "{decision.reasoning}"
+                        &quot;{decision.reasoning}&quot;
                     </p>
                 </div>
 

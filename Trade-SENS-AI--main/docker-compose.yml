@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "5000:5000"
+    environment:
+      - FLASK_ENV=production
+      - PYTHONUNBUFFERED=1
+      - SECRET_KEY=${SECRET_KEY:-dev_secret_key}
+      - DATABASE_URL=${DATABASE_URL:-sqlite:////app/instance/tradesense.db}
+    volumes:
+      - ./backend/instance:/app/instance
+    networks:
+      - tradesense-network
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:3000
+      - BACKEND_URL=http://backend:5000
+    depends_on:
+      - backend
+    networks:
+      - tradesense-network
+
+networks:
+  tradesense-network:
+    driver: bridge

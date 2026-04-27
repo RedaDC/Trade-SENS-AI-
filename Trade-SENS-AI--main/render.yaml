@@ -1,0 +1,28 @@
+services:
+  # Frontend - Next.js
+  - type: web
+    name: tradesense-frontend
+    env: node
+    region: oregon
+    buildCommand: cd frontend && npm install && npm run build
+    startCommand: cd frontend && npm start
+    plan: free
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NEXT_PUBLIC_API_URL
+        sync: false
+
+  # Backend - Flask API
+  - type: web
+    name: tradesense-backend
+    env: python
+    region: oregon
+    buildCommand: cd backend && pip install -r requirements.txt
+    startCommand: cd backend && gunicorn -w 4 -b 0.0.0.0:$PORT app:app
+    plan: free
+    envVars:
+      - key: FLASK_ENV
+        value: production
+      - key: PYTHON_VERSION
+        value: 3.11.0

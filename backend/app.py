@@ -40,4 +40,5 @@ def create_app(config_class=DevelopmentConfig):
 if __name__ == '__main__':
     app = create_app()
     # Use host='0.0.0.0' for better accessibility and disable reloader if signals are restricted
-    app.run(host='0.0.0.0', port=5000, debug=True, use_reloader=False)
+    port = int(os.environ.get('PORT', 5005))
+    app.run(host='0.0.0.0', port=port, debug=True, use_reloader=False)

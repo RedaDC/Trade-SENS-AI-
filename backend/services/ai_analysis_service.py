@@ -141,7 +141,11 @@ class AIAnalysisService:
         scenarios = self._evaluate_coherent_scenarios(trend_direction, price)
         
         # 6. Make Decision (Obvious based on the trend)
+<<<<<<< HEAD
         decision = self._make_coherent_decision(trend_direction, scenarios, symbol=symbol)
+=======
+        decision = self._make_coherent_decision(trend_direction, scenarios)
+>>>>>>> 104744f1a8f354c139261e224ea62ab97bb4c620
         
         # 7. Risk Management
         risk_management = self._calculate_risk_management(decision, price)
@@ -244,12 +248,70 @@ class AIAnalysisService:
             "positioning": f"Biased {trend}"
         }
 
+<<<<<<< HEAD
+=======
+    def _generate_coherent_news(self, trend, symbol):
+        impact = trend if trend != "Range" else "Neutral"
+        headlines = {
+            "Bullish": ["Strong Earnings Beat Expectations", "Analyst Upgrades to Outperform", "Positive Macro Data Release"],
+            "Bearish": ["Inflation Concerns Rise", "Missed Earnings & Weak Guidance", "Regulatory Headwinds Intensify"],
+            "Neutral": ["Market Awaits Fed Decision", "Consolidation Continues on Low Vol", "Mixed Economic Data"]
+        }
+        return {
+            "impact": impact,
+            "key_events": random.sample(headlines.get(trend, headlines["Neutral"]), 2),
+            "description": f"News flow is supporting a {trend.lower()} outlook.",
+            "overreaction_risk": "Medium"
+        }
+
+    def _evaluate_coherent_scenarios(self, trend, price):
+        if trend == "Bullish":
+            return {
+                "bullish": {"probability": 75, "case": f"Breakout above {round(price*1.005, 2)} confirms continuation.", "target": round(price*1.04, 2)},
+                "bearish": {"probability": 15, "case": f"Unexpected drop below {round(price*0.99, 2)} invalidates.", "target": round(price*0.97, 2)},
+                "wait": {"probability": 10, "case": "Consolidation at highs.", "reason": "Overbought temporarily."}
+            }
+        elif trend == "Bearish":
+            return {
+                "bullish": {"probability": 15, "case": f"Reversal above {round(price*1.02, 2)}.", "target": round(price*1.05, 2)},
+                "bearish": {"probability": 75, "case": f"breakdown below {round(price*0.995, 2)} targets lows.", "target": round(price*0.95, 2)},
+                "wait": {"probability": 10, "case": "Oversold bounce likely.", "reason": "Taking profits."}
+            }
+        else: # Range
+            return {
+                "bullish": {"probability": 30, "case": f"Break resistance at {round(price*1.01, 2)}.", "target": round(price*1.03, 2)},
+                "bearish": {"probability": 30, "case": f"Break support at {round(price*0.99, 2)}.", "target": round(price*0.97, 2)},
+                "wait": {"probability": 40, "case": "Chop city.", "reason": "No clear direction."}
+            }
+
+    def _make_coherent_decision(self, trend, scenarios):
+        if trend == "Bullish":
+            return {
+                "recommendation": "BUY",
+                "confidence": scenarios["bullish"]["probability"],
+                "reasoning": "Strong bullish structure with confirmed EMA alignment and positive momentum."
+            }
+        elif trend == "Bearish":
+            return {
+                "recommendation": "SELL",
+                "confidence": scenarios["bearish"]["probability"],
+                "reasoning": "Bearish market structure, negative MACD, and price rejected at EMA resistance."
+            }
+        else:
+            return {
+                "recommendation": "WAIT",
+                "confidence": scenarios["wait"]["probability"],
+                "reasoning": "Market is consolidating. Wait for a breakout of key levels before entering."
+            }
+    
+>>>>>>> 104744f1a8f354c139261e224ea62ab97bb4c620
     def _get_simulated_price(self, symbol: str) -> float:
         """Generate realistic simulated price"""
         base_prices = {
             "EURUSD": 1.0950, "GBPUSD": 1.2750, "USDJPY": 148.50,
             "BTCUSD": 45000.00, "TSLA": 245.00, "AAPL": 185.00, "GOLD": 2030.00,
         }
+<<<<<<< HEAD
         if symbol.startswith('OPCVM_'):
             base = 1000.0 + (sum(ord(c) for c in symbol) % 500) * 10
             # Low volatility for funds
@@ -335,6 +397,16 @@ class AIAnalysisService:
                 "confidence": scenarios["wait"]["probability"],
                 "reasoning": reason
             }
+=======
+        if symbol.endswith('.MA'):
+            base = 100.0 + (sum(ord(c) for c in symbol) % 500)
+        else:
+            base = base_prices.get(symbol, 100.0)
+        variation = (random.random() - 0.5) * (base * 0.02)
+        return round(base + variation, 2)
+    
+    def _analyze_news(self, symbol: str) -> Dict[str, Any]:
+>>>>>>> 104744f1a8f354c139261e224ea62ab97bb4c620
         """Placeholder for Real Mode pre-analysis"""
         return {}
     

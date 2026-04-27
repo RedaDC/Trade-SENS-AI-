@@ -160,6 +160,7 @@ class YFinanceProvider(IMarketDataProvider):
             raise e
 
 class MockProvider(IMarketDataProvider):
+<<<<<<< HEAD
     """Fallback if everything fails, modified for Moroccan OPCVMs"""
     def __init__(self):
         print("Market Data initialized with MockProvider (Simulation).")
@@ -174,6 +175,13 @@ class MockProvider(IMarketDataProvider):
             variation = (random.random() - 0.5) * (base * 0.005) 
             return round(base + variation, 2)
             
+=======
+    """Fallback if everything fails"""
+    def __init__(self):
+        print("Market Data initialized with MockProvider (Simulation).")
+
+    def get_last_price(self, symbol: str) -> float:
+>>>>>>> 104744f1a8f354c139261e224ea62ab97bb4c620
         base = 100.0 + (sum(ord(c) for c in symbol) % 500)
         variation = (random.random() - 0.5) * 2
         return round(base + variation, 2)
@@ -183,6 +191,7 @@ class MockProvider(IMarketDataProvider):
         import datetime as dt
         base_price = self.get_last_price(symbol)
         start_date = datetime.now() - dt.timedelta(days=limit)
+<<<<<<< HEAD
         is_fond = self._is_opcvm(symbol)
         
         for i in range(limit):
@@ -208,6 +217,19 @@ class MockProvider(IMarketDataProvider):
                 'close': round(close_p, 2),
                 # Funds have lower, simulated block volumes
                 'volume': int(random.random() * 5000) if is_fond else int(random.random() * 100000)
+=======
+        for i in range(limit):
+            current_date = start_date + dt.timedelta(days=i)
+            move = (random.random() - 0.5) * 2
+            close_p = base_price + move
+            data.append({
+                'time': current_date.strftime('%Y-%m-%d'),
+                'open': round(base_price, 2),
+                'high': round(max(base_price, close_p) + 1, 2),
+                'low': round(min(base_price, close_p) - 1, 2),
+                'close': round(close_p, 2),
+                'volume': int(random.random() * 100000)
+>>>>>>> 104744f1a8f354c139261e224ea62ab97bb4c620
             })
             base_price = close_p
         return data
@@ -215,8 +237,25 @@ class MockProvider(IMarketDataProvider):
 class MarketDataFactory:
     @staticmethod
     def get_provider() -> IMarketDataProvider:
+<<<<<<< HEAD
         # Forcing MockProvider to ensure app is responsive on localhost
         return MockProvider()
+=======
+        api_key = os.environ.get('POLYGON_API_KEY')
+        
+        # Priority 1: Polygon (if key exists and library installed)
+        if api_key and RESTClient:
+            try:
+                # Test connection (optional, or just return)
+                return PolygonProvider(api_key)
+            except:
+                pass
+        
+        # Priority 2: YFinance (Free Tier)
+        # Note: YFinance can be flaky, so we wrap in try/catch logic in consumption too,
+        # but here we just return the provider.
+        return YFinanceProvider()
+>>>>>>> 104744f1a8f354c139261e224ea62ab97bb4c620
 
     @staticmethod
     def get_fallback_provider():

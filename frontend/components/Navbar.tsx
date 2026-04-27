@@ -13,10 +13,7 @@ export default function Navbar() {
                 <Link href="/news" className="hover:text-blue-400 transition">News</Link>
                 <Link href="/leaderboard" className="hover:text-blue-400 transition">Leaderboard</Link>
                 <Link href="/dashboard" className="hover:text-blue-400 transition">Dashboard</Link>
-<<<<<<< HEAD
-                <Link href="/opcvm" className="hover:text-blue-400 transition font-bold">OPCVM Maroc</Link>
-=======
->>>>>>> 104744f1a8f354c139261e224ea62ab97bb4c620
+                <Link href="/opcvm" className="hover:text-blue-400 transition font-bold text-emerald-400">OPCVM Maroc</Link>
             </div>
             <div className="flex gap-4">
                 <Link href="/login">

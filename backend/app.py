@@ -39,9 +39,5 @@ def create_app(config_class=DevelopmentConfig):
 
 if __name__ == '__main__':
     app = create_app()
-<<<<<<< HEAD
     # Use host='0.0.0.0' for better accessibility and disable reloader if signals are restricted
     app.run(host='0.0.0.0', port=5000, debug=True, use_reloader=False)
-=======
-    app.run(debug=True)
->>>>>>> 104744f1a8f354c139261e224ea62ab97bb4c620
